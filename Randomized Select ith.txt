@@ -1,0 +1,79 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib> // for rand()
+#include <ctime>   // for srand()
+
+using namespace std;
+
+// Function to swap two elements
+void swap(int &a, int &b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+// Partition function with randomized pivot
+int randomizedPartition(vector<int> &arr, int low, int high) {
+    // Select a random pivot index
+    int pivotIndex = low + rand() % (high - low + 1);
+    swap(arr[pivotIndex], arr[high]); // Swap random pivot with the last element
+
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; ++j) {
+        if (arr[j] <= pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+// Randomized Select algorithm
+int randomizedSelect(vector<int> &arr, int low, int high, int i) {
+    if (low == high) {
+        return arr[low]; // Only one element
+    }
+
+    int pivotIndex = randomizedPartition(arr, low, high);
+    int k = pivotIndex - low + 1; // Position of the pivot in the sorted array
+
+    if (i == k) {
+        return arr[pivotIndex]; // The pivot is the i-th smallest element
+    } else if (i < k) {
+        return randomizedSelect(arr, low, pivotIndex - 1, i); // Search in the left part
+    } else {
+        return randomizedSelect(arr, pivotIndex + 1, high, i - k); // Search in the right part
+    }
+}
+
+int main() {
+    srand(time(0)); // Seed for random number generator
+
+    int n;
+    cout << "Enter the number of elements: ";
+    cin >> n;
+
+    vector<int> arr(n);
+    cout << "Enter the elements: ";
+    for (int i = 0; i < n; ++i) {
+        cin >> arr[i];
+    }
+
+    int i;
+    cout << "Enter the value of i (1-based index): ";
+    cin >> i;
+
+    if (i < 1 || i > n) {
+        cout << "Invalid value of i. Must be between 1 and " << n << "." << endl;
+        return 1;
+    }
+
+    // Find the i-th smallest element
+    int ithSmallest = randomizedSelect(arr, 0, n - 1, i);
+    cout << "The " << i << "-th smallest element is: " << ithSmallest << endl;
+
+    return 0;
+}
